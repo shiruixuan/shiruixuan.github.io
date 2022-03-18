@@ -14,9 +14,6 @@
   {%- set copyright_year = date(null, 'YYYY') %}
   &copy; {% if theme.footer.since and theme.footer.since != copyright_year %}{{ theme.footer.since }} – {% endif %}
   <span itemprop="copyrightYear">{{ copyright_year }}</span>
-  <span class="with-love">
-    <i class="{{ theme.footer.icon.name }}"></i>
-  </span>
   <span class="author" itemprop="copyrightHolder">{{ theme.footer.copyright or author }}</span>
 </div>
 
@@ -76,8 +73,7 @@
 
 {%- if theme.footer.powered %}
   <div class="powered-by">
-    {%- set next_site = 'https://theme-next.js.org' if theme.scheme === 'Gemini' else 'https://theme-next.js.org/' + theme.scheme | lower + '/' %}
-    {{- __('footer.powered', next_url('https://hexo.io', 'Hexo') + ' & ' + next_url(next_site, 'NexT.' + theme.scheme)) }}
+    {{- __('footer.powered', next_url('https://shiruixuan.github.io', '张三')) }}
   </div>
 {%- endif %}
 
