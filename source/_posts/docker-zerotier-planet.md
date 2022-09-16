@@ -59,7 +59,7 @@ Zerotier 在多设备之间建立了一个 `Peer to Peer VPN（P2PVPN）` 连接
   
 ## 3.2：下载项目源码
 ```
-git clone https://github.com/shiruixuan/docker-zerotier-planet.git --depth 1
+git clone http://gh-proxy.markxu.vip/https://github.com/shiruixuan/docker-zerotier-planet.git --depth 1
 ```
 ## 3.3：执行安装脚本
 进入项目目录
