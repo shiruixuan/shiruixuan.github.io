@@ -36,7 +36,7 @@ Zerotier 在多设备之间建立了一个 `Peer to Peer VPN（P2PVPN）` 连接
 
 简单一点说，`Zerotier` 就是通过 `P2P` 等方式实现形如交换机或路由器上 `LAN`   设备的内网互联。
 
-![zerotier](https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/zerotier-network.png)
+![zerotier](http://gh-proxy.markxu.vip/https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/zerotier-network.png)
 
 **专有名词**
 
@@ -106,7 +106,7 @@ WARNING: Published ports are discarded when using host network mode
 ## 3.5 新建网络
 访问 `http://ip:3443` 进入controller页面
 
-![ui](https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/ztncui.png)
+![ui](http://gh-proxy.markxu.vip/https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/ztncui.png)
 
 使用默认账号为:`admin`
 
@@ -117,11 +117,11 @@ WARNING: Published ports are discarded when using host network mode
 
 创建网络，输入名称
 
-![ui](https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/ztncui_create_net.png)
+![ui](http://gh-proxy.markxu.vip/https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/ztncui_create_net.png)
 
 得到网络 `id`
 
-![ui](https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/ztncui_net_id.png)
+![ui](http://gh-proxy.markxu.vip/https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/ztncui_net_id.png)
 
 
 # 4.客户端配置
@@ -134,11 +134,11 @@ WARNING: Published ports are discarded when using host network mode
 
 Win+S 搜索 `服务`
 
-![ui](https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/service.png)
+![ui](http://gh-proxy.markxu.vip/https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/service.png)
 
 找到ZeroTier One，并且重启服务
 
-![ui](https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/restart_service.png)
+![ui](http://gh-proxy.markxu.vip/https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/restart_service.png)
 
 
 ### 4.2 加入网络
@@ -153,7 +153,7 @@ PS C:\Windows\system32>
 
 登录管理后台可以看到有个个新的客户端，勾选Authorized就行
 
-![ui](https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/join_net.png)
+![ui](http://gh-proxy.markxu.vip/https://raw.githubusercontent.com/shiruixuan/imagehost/main/asserts/join_net.png)
 
 执行如下命令：
 ```
