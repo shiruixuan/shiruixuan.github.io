@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"shiruixuan.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="功能特性 ✅ 支持 Linux&#x2F;AMD64、Linux&#x2F;ARM64 架构 🐳 Docker 容器化部署 📥 支持 URL 下载 planet、moon 配置 🌐 可作为 Moon 或 Planet 服务器搭建  目录 1：ZeroTier 介绍 2：为什么要自建PLANET 服务器 3：开始安装 3.1：准备条件 3.1.1 安装git 3.1.2 安装docker 3.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="搭建私有 ZeroTier Planet 根服务器（Docker 版）">
+<meta property="og:url" content="https://shiruixuan.github.io/2022/09/16/docker-zerotier-planet/index.html">
+<meta property="og:site_name" content="shiruixuan">
+<meta property="og:description" content="功能特性 ✅ 支持 Linux&#x2F;AMD64、Linux&#x2F;ARM64 架构 🐳 Docker 容器化部署 📥 支持 URL 下载 planet、moon 配置 🌐 可作为 Moon 或 Planet 服务器搭建  目录 1：ZeroTier 介绍 2：为什么要自建PLANET 服务器 3：开始安装 3.1：准备条件 3.1.1 安装git 3.1.2 安装docker 3.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/nb-speed-test.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/zerotier-network.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/install_finish.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/ztncui.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/ztncui_create_net.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/ztncui_net_id.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/easy_setup.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/network_addr.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/service.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/restart_service.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/join_net.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/allow_devices.png">
+<meta property="article:published_time" content="2022-09-16T07:46:00.000Z">
+<meta property="article:modified_time" content="2025-05-30T02:01:44.782Z">
+<meta property="article:author" content="shiruixuan">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/nb-speed-test.png">
+
+
+<link rel="canonical" href="https://shiruixuan.github.io/2022/09/16/docker-zerotier-planet/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://shiruixuan.github.io/2022/09/16/docker-zerotier-planet/","path":"2022/09/16/docker-zerotier-planet/","title":"搭建私有 ZeroTier Planet 根服务器（Docker 版）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>搭建私有 ZeroTier Planet 根服务器（Docker 版） | shiruixuan</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">shiruixuan</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD%E7%89%B9%E6%80%A7"><span class="nav-number">1.</span> <span class="nav-text">功能特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">2.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1%EF%BC%9AZeroTier-%E4%BB%8B%E7%BB%8D"><span class="nav-number">3.</span> <span class="nav-text">1：ZeroTier 介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E8%87%AA%E5%BB%BAPLANET-%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">4.</span> <span class="nav-text">2：为什么要自建PLANET 服务器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3%EF%BC%9A%E5%BC%80%E5%A7%8B%E5%AE%89%E8%A3%85"><span class="nav-number">5.</span> <span class="nav-text">3：开始安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1%EF%BC%9A%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="nav-number">5.1.</span> <span class="nav-text">3.1：环境准备</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-1-%E5%AE%89%E8%A3%85git"><span class="nav-number">5.1.1.</span> <span class="nav-text">3.1.1 安装git</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-2-%E5%AE%89%E8%A3%85docker"><span class="nav-number">5.1.2.</span> <span class="nav-text">3.1.2 安装docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-3-%E5%90%AF%E5%8A%A8docker"><span class="nav-number">5.1.3.</span> <span class="nav-text">3.1.3 启动docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-4-%E9%85%8D%E7%BD%AEdocker%E5%8A%A0%E9%80%9F%E9%95%9C%E5%83%8F%EF%BC%88%E5%8F%AF%E9%80%89%EF%BC%8C%E4%B8%8D%E9%85%8D%E4%B9%9F%E5%8F%AF%E4%BB%A5%EF%BC%89"><span class="nav-number">5.1.4.</span> <span class="nav-text">3.1.4 配置docker加速镜像（可选，不配也可以）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2%EF%BC%9A%E4%B8%8B%E8%BD%BD%E9%A1%B9%E7%9B%AE%E6%BA%90%E7%A0%81"><span class="nav-number">5.2.</span> <span class="nav-text">3.2：下载项目源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3%EF%BC%9A%E6%89%A7%E8%A1%8C%E5%AE%89%E8%A3%85%E8%84%9A%E6%9C%AC"><span class="nav-number">5.3.</span> <span class="nav-text">3.3：执行安装脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-%E4%B8%8B%E8%BD%BD-planet-%E6%96%87%E4%BB%B6"><span class="nav-number">5.4.</span> <span class="nav-text">3.4 下载 planet 文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-%E6%96%B0%E5%BB%BA%E7%BD%91%E7%BB%9C"><span class="nav-number">5.5.</span> <span class="nav-text">3.5 新建网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-1-%E5%88%9B%E5%BB%BA%E7%BD%91%E7%BB%9C"><span class="nav-number">5.5.1.</span> <span class="nav-text">3.5.1 创建网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-2-%E5%88%86%E9%85%8D%E7%BD%91%E7%BB%9CIP"><span class="nav-number">5.5.2.</span> <span class="nav-text">3.5.2 分配网络IP:</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-number">6.</span> <span class="nav-text">4.客户端配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-Windows-%E9%85%8D%E7%BD%AE"><span class="nav-number">6.1.</span> <span class="nav-text">4.1 Windows 配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%8A%A0%E5%85%A5%E7%BD%91%E7%BB%9C"><span class="nav-number">6.1.1.</span> <span class="nav-text">4.2 加入网络</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-Linux-%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">6.2.</span> <span class="nav-text">4.2 Linux 客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-%E5%AE%89%E5%8D%93%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-number">6.3.</span> <span class="nav-text">4.3 安卓客户端配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-MacOS-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-number">6.4.</span> <span class="nav-text">4.4 MacOS 客户端配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-5-OpenWRT-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-number">6.5.</span> <span class="nav-text">4.5 OpenWRT 客户端配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-6-iOS-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE"><span class="nav-number">6.6.</span> <span class="nav-text">4.6 iOS 客户端配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E7%AE%A1%E7%90%86%E9%9D%A2%E6%9D%BFSSL%E9%85%8D%E7%BD%AE"><span class="nav-number">7.</span> <span class="nav-text">5. 管理面板SSL配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-%E5%8D%B8%E8%BD%BD"><span class="nav-number">8.</span> <span class="nav-text">6. 卸载</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-Q-amp-A%EF%BC%9A"><span class="nav-number">9.</span> <span class="nav-text">7: Q&amp;A：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91ping%E4%B8%8D%E9%80%9A%E7%9B%AE%E6%A0%87%E6%9C%BA%E5%99%A8%EF%BC%9F"><span class="nav-number">9.1.</span> <span class="nav-text">1. 为什么我ping不通目标机器？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-IOS%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%80%8E%E4%B9%88%E7%94%A8%EF%BC%9F"><span class="nav-number">9.2.</span> <span class="nav-text">2. IOS客户端怎么用？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%B8%BA%E4%BB%80%E4%B9%88%E7%9C%8B%E4%B8%8D%E5%88%B0%E5%AE%98%E6%96%B9%E7%9A%84Planet"><span class="nav-number">9.3.</span> <span class="nav-text">3. 为什么看不到官方的Planet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%88%91%E6%9B%B4%E6%8D%A2%E4%BA%86IP%E9%9C%80%E8%A6%81%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86%EF%BC%9F"><span class="nav-number">9.4.</span> <span class="nav-text">4. 我更换了IP需要怎么处理？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-PVE-lxc-%E5%AE%B9%E5%99%A8%E6%B2%A1%E6%9C%89%E5%88%9B%E5%BB%BA%E7%BD%91%E5%8D%A1"><span class="nav-number">9.5.</span> <span class="nav-text">5. PVE lxc 容器没有创建网卡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E5%BF%98%E8%AE%B0%E5%AF%86%E7%A0%81%E6%80%8E%E4%B9%88%E5%8A%9E%EF%BC%9A"><span class="nav-number">9.6.</span> <span class="nav-text">6. 管理后台忘记密码怎么办：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%9E%E4%B8%8D%E4%B8%8Aplanet"><span class="nav-number">9.7.</span> <span class="nav-text">7. 为什么连不上planet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E6%98%AF%E7%9B%B4%E8%BF%9E%E8%BF%98%E6%98%AF%E4%B8%AD%E8%BD%AC"><span class="nav-number">9.8.</span> <span class="nav-text">8. 如何判断是直连还是中转</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E7%9A%84zerotier%E4%BC%A0%E8%BE%93%E4%B8%8D%E7%A8%B3%E5%AE%9A"><span class="nav-number">9.9.</span> <span class="nav-text">9. 为什么我的zerotier传输不稳定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-%E6%94%AF%E6%8C%81%E5%9F%9F%E5%90%8D%E5%90%97%EF%BC%9F"><span class="nav-number">9.10.</span> <span class="nav-text">10.支持域名吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-ARM%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8F%AF%E4%BB%A5%E6%90%AD%E5%BB%BA%E5%90%97"><span class="nav-number">9.11.</span> <span class="nav-text">11. ARM服务器可以搭建吗</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12-%E6%94%AF%E6%8C%81docker-compose%E5%90%AF%E5%8A%A8%E9%83%A8%E7%BD%B2%E5%90%97"><span class="nav-number">9.12.</span> <span class="nav-text">12. 支持docker-compose启动部署吗</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E8%AE%A1%E5%88%92"><span class="nav-number">10.</span> <span class="nav-text">开发计划</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A3%8E%E9%99%A9%E5%A3%B0%E6%98%8E"><span class="nav-number">11.</span> <span class="nav-text">风险声明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B1%BB%E4%BC%BC%E9%A1%B9%E7%9B%AE"><span class="nav-number">12.</span> <span class="nav-text">类似项目</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">13.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">shiruixuan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://shiruixuan.github.io/2022/09/16/docker-zerotier-planet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="shiruixuan">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="shiruixuan">
+      <meta itemprop="description" content="">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="搭建私有 ZeroTier Planet 根服务器（Docker 版） | shiruixuan">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          搭建私有 ZeroTier Planet 根服务器（Docker 版）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-09-16 15:46:00" itemprop="dateCreated datePublished" datetime="2022-09-16T15:46:00+08:00">2022-09-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2025-05-30 10:01:44" itemprop="dateModified" datetime="2025-05-30T10:01:44+08:00">2025-05-30</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="功能特性"><a href="#功能特性" class="headerlink" title="功能特性"></a>功能特性</h1><ul>
+<li>✅ 支持 Linux&#x2F;AMD64、Linux&#x2F;ARM64 架构</li>
+<li>🐳 Docker 容器化部署</li>
+<li>📥 支持 URL 下载 planet、moon 配置</li>
+<li>🌐 可作为 Moon 或 Planet 服务器搭建</li>
+</ul>
+<h1 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h1><ul>
+<li><a href="#1zerotier-%E4%BB%8B%E7%BB%8D">1：ZeroTier 介绍</a></li>
+<li><a href="#2%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E8%87%AA%E5%BB%BAplanet-%E6%9C%8D%E5%8A%A1%E5%99%A8">2：为什么要自建PLANET 服务器</a></li>
+<li><a href="#3%E5%BC%80%E5%A7%8B%E5%AE%89%E8%A3%85">3：开始安装</a><ul>
+<li><a href="#31%E5%87%86%E5%A4%87%E6%9D%A1%E4%BB%B6">3.1：准备条件</a><ul>
+<li><a href="#311-%E5%AE%89%E8%A3%85git">3.1.1 安装git</a></li>
+<li><a href="#312-%E5%AE%89%E8%A3%85docker">3.1.2 安装docker</a></li>
+<li><a href="#313-%E5%90%AF%E5%8A%A8docker">3.1.3 启动docker</a></li>
+<li><a href="#314-%E9%85%8D%E7%BD%AEdocker%E5%8A%A0%E9%80%9F%E9%95%9C%E5%83%8F%E5%8F%AF%E9%80%89%E4%B8%8D%E9%85%8D%E4%B9%9F%E5%8F%AF%E4%BB%A5">3.1.4 配置docker加速镜像（可选，不配也可以）</a></li>
+</ul>
+</li>
+<li><a href="#32%E4%B8%8B%E8%BD%BD%E9%A1%B9%E7%9B%AE%E6%BA%90%E7%A0%81">3.2：下载项目源码</a></li>
+<li><a href="#33%E6%89%A7%E8%A1%8C%E5%AE%89%E8%A3%85%E8%84%9A%E6%9C%AC">3.3：执行安装脚本</a></li>
+<li><a href="#34-%E4%B8%8B%E8%BD%BD-planet-%E6%96%87%E4%BB%B6">3.4 下载 <code>planet</code> 文件</a></li>
+<li><a href="#35-%E6%96%B0%E5%BB%BA%E7%BD%91%E7%BB%9C">3.5 新建网络</a><ul>
+<li><a href="#351-%E5%88%9B%E5%BB%BA%E7%BD%91%E7%BB%9C">3.5.1 创建网络</a></li>
+<li><a href="#352-%E5%88%86%E9%85%8D%E7%BD%91%E7%BB%9Cip">3.5.2 分配网络IP:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#4%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE">4.客户端配置</a><ul>
+<li><a href="#41-windows-%E9%85%8D%E7%BD%AE">4.1 Windows 配置</a><ul>
+<li><a href="#42-%E5%8A%A0%E5%85%A5%E7%BD%91%E7%BB%9C">4.2 加入网络</a></li>
+</ul>
+</li>
+<li><a href="#42-linux-%E5%AE%A2%E6%88%B7%E7%AB%AF">4.2 Linux 客户端</a></li>
+<li><a href="#43-%E5%AE%89%E5%8D%93%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE">4.3 安卓客户端配置</a></li>
+<li><a href="#44-macos-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE">4.4 MacOS 客户端配置</a></li>
+<li><a href="#45-openwrt-%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE">4.5 OpenWRT 客户端配置</a></li>
+</ul>
+</li>
+<li><a href="#5-%E7%AE%A1%E7%90%86%E9%9D%A2%E6%9D%BFssl%E9%85%8D%E7%BD%AE">5. 管理面板SSL配置</a></li>
+<li><a href="#6-%E5%8D%B8%E8%BD%BD">6. 卸载</a></li>
+<li><a href="#7-qa">7: Q&amp;A：</a><ul>
+<li><a href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91ping%E4%B8%8D%E9%80%9A%E7%9B%AE%E6%A0%87%E6%9C%BA%E5%99%A8">1. 为什么我ping不通目标机器？</a></li>
+<li><a href="#2-ios%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%80%8E%E4%B9%88%E7%94%A8">2. IOS客户端怎么用？</a></li>
+<li><a href="#3-%E4%B8%BA%E4%BB%80%E4%B9%88%E7%9C%8B%E4%B8%8D%E5%88%B0%E5%AE%98%E6%96%B9%E7%9A%84planet">3. 为什么看不到官方的Planet</a></li>
+<li><a href="#4-%E6%88%91%E6%9B%B4%E6%8D%A2%E4%BA%86ip%E9%9C%80%E8%A6%81%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86">4. 我更换了IP需要怎么处理？</a></li>
+<li><a href="#5-pve-lxc-%E5%AE%B9%E5%99%A8%E6%B2%A1%E6%9C%89%E5%88%9B%E5%BB%BA%E7%BD%91%E5%8D%A1">5. PVE lxc 容器没有创建网卡</a></li>
+<li><a href="#6-%E7%AE%A1%E7%90%86%E5%90%8E%E5%8F%B0%E5%BF%98%E8%AE%B0%E5%AF%86%E7%A0%81%E6%80%8E%E4%B9%88%E5%8A%9E">6. 管理后台忘记密码怎么办：</a></li>
+<li><a href="#7-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%9E%E4%B8%8D%E4%B8%8Aplanet">7. 为什么连不上planet</a></li>
+<li><a href="#8-%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E6%98%AF%E7%9B%B4%E8%BF%9E%E8%BF%98%E6%98%AF%E4%B8%AD%E8%BD%AC">8. 如何判断是直连还是中转</a></li>
+<li><a href="#9-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E7%9A%84zerotier%E4%BC%A0%E8%BE%93%E4%B8%8D%E7%A8%B3%E5%AE%9A">9. 为什么我的zerotier传输不稳定</a></li>
+<li><a href="#10%E6%94%AF%E6%8C%81%E5%9F%9F%E5%90%8D%E5%90%97">10.支持域名吗？</a></li>
+<li><a href="#11-arm%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%8F%AF%E4%BB%A5%E6%90%AD%E5%BB%BA%E5%90%97">11. ARM服务器可以搭建吗</a></li>
+<li><a href="#12-%E6%94%AF%E6%8C%81docker-compose%E5%90%AF%E5%8A%A8%E9%83%A8%E7%BD%B2%E5%90%97">12. 支持docker-compose启动部署吗</a></li>
+</ul>
+</li>
+<li><a href="#%E5%BC%80%E5%8F%91%E8%AE%A1%E5%88%92">开发计划</a></li>
+<li><a href="#%E9%A3%8E%E9%99%A9%E5%A3%B0%E6%98%8E">风险声明</a></li>
+<li><a href="#%E7%B1%BB%E4%BC%BC%E9%A1%B9%E7%9B%AE">类似项目</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5">参考链接</a></li>
+</ul>
+<p>测速图如下：</p>
+<img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/nb-speed-test.png" width = "800" height = "" alt="图片名称" align=center />
+
+<h1 id="1：ZeroTier-介绍"><a href="#1：ZeroTier-介绍" class="headerlink" title="1：ZeroTier 介绍"></a>1：ZeroTier 介绍</h1><p><code>ZeroTier</code> 是一款强大的 P2P VPN 工具，它能让你在互联网上搭建属于自己的虚拟局域网。通过它，你可以轻松实现远程访问家中设备的需求 - 比如在公司用手机直接访问家里的 NAS。最重要的是，设备之间是点对点直连的，无需经过中转服务器，既保证了速度，又提升了安全性。</p>
+<p>它的工作原理是这样的：通过 <code>ZeroTier One</code> 客户端，在不同设备（如笔记本、手机、服务器等）之间建立 P2P 连接，即使这些设备都在 NAT 后面也没问题。它使用了 STUN 等技术，可以穿透大多数类型的 NAT，实现设备间的直接通信。如果实在无法直连，才会通过中转服务器进行通信。</p>
+<p>简单来说，<code>ZeroTier</code> 就像是一个跨越互联网的”虚拟交换机”，让分布在世界各地的设备，都能像在同一个局域网内一样方便地相互访问。</p>
+<p><img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/zerotier-network.png" alt="zerotier"></p>
+<p><strong>ZeroTier 网络中的关键概念</strong></p>
+<p><code>PLANET</code>（行星服务器）：ZeroTier 网络的核心根服务器，负责网络发现和初始连接。相当于整个网络的”中枢”。</p>
+<p><code>MOON</code>（卫星服务器）：用户可以自建的私有根服务器。它可以作为区域性的代理节点,帮助就近的设备更快地建立连接,提升网络性能。</p>
+<p><code>LEAF</code>（叶子节点）：所有接入 ZeroTier 网络的终端设备,如电脑、手机、服务器等。这些设备通过 PLANET 和 MOON 的协调来相互发现和通信。</p>
+<p>本教程将指导您搭建一个私有的 PLANET 服务器,让您完全掌控自己的 ZeroTier 网络。</p>
+<h1 id="2：为什么要自建PLANET-服务器"><a href="#2：为什么要自建PLANET-服务器" class="headerlink" title="2：为什么要自建PLANET 服务器"></a>2：为什么要自建PLANET 服务器</h1><p>自建 PLANET 服务器有以下几个重要原因：</p>
+<ol>
+<li><p>提升网络稳定性：官方服务器位于海外，国内用户访问延迟高且不稳定。自建服务器可以大幅提升连接质量。</p>
+</li>
+<li><p>加快连接速度：本地化的 PLANET 服务器可以更快地帮助设备建立 P2P 连接。</p>
+</li>
+<li><p>增强网络控制：自建服务器让您完全掌控网络配置，可以根据需求进行优化调整。</p>
+</li>
+<li><p>提高安全性：私有化部署意味着网络流量不经过第三方服务器，更加安全可靠。</p>
+</li>
+<li><p>降低依赖：避免因官方服务器故障或网络波动影响您的业务正常运行。</p>
+</li>
+</ol>
+<h1 id="3：开始安装"><a href="#3：开始安装" class="headerlink" title="3：开始安装"></a>3：开始安装</h1><h2 id="3-1：环境准备"><a href="#3-1：环境准备" class="headerlink" title="3.1：环境准备"></a>3.1：环境准备</h2><p>在开始安装之前，请确保您的服务器满足以下条件:</p>
+<ul>
+<li><p>服务器要求:</p>
+<ul>
+<li>拥有公网IP地址</li>
+<li>需开放以下端口:<ul>
+<li>3443&#x2F;tcp (管理面板，根据实际情况调整)</li>
+<li>9994&#x2F;tcp (ZeroTier通信，根据实际情况调整)</li>
+<li>9994&#x2F;udp (ZeroTier通信，根据实际情况调整)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>软件依赖:</p>
+<ul>
+<li>Docker (容器运行环境)</li>
+<li>Git (获取项目代码)</li>
+</ul>
+</li>
+<li><p>系统要求:</p>
+<ul>
+<li>推荐使用较新的Linux发行版:<ul>
+<li>Debian 12</li>
+<li>Ubuntu 20.04+</li>
+<li>Rocky Linux</li>
+<li>其他同类系统</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-1-1-安装git"><a href="#3-1-1-安装git" class="headerlink" title="3.1.1 安装git"></a>3.1.1 安装git</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#debian/ubuntu等</span></span><br><span class="line">apt update &amp;&amp; apt install git -y </span><br><span class="line"></span><br><span class="line"><span class="comment">#centos等</span></span><br><span class="line">yum update &amp;&amp; yum install git -y </span><br></pre></td></tr></table></figure>
+
+<h3 id="3-1-2-安装docker"><a href="#3-1-2-安装docker" class="headerlink" title="3.1.2 安装docker"></a>3.1.2 安装docker</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL https://get.docker.com |bash </span><br></pre></td></tr></table></figure>
+
+<p>如果网络问题，导致无法安装，可以使用国内镜像安装：<br>请参考：<a target="_blank" rel="noopener" href="https://help.aliyun.com/zh/ecs/use-cases/install-and-use-docker#33f11a5f1800n">安装Docker</a></p>
+<h3 id="3-1-3-启动docker"><a href="#3-1-3-启动docker" class="headerlink" title="3.1.3 启动docker"></a>3.1.3 启动docker</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service docker start</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-1-4-配置docker加速镜像（可选，不配也可以）"><a href="#3-1-4-配置docker加速镜像（可选，不配也可以）" class="headerlink" title="3.1.4 配置docker加速镜像（可选，不配也可以）"></a>3.1.4 配置docker加速镜像（可选，不配也可以）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">sudo tee /etc/docker/daemon.json &lt;&lt;EOF</span><br><span class="line">&#123;</span><br><span class="line">    &quot;registry-mirrors&quot;: [</span><br><span class="line">        &quot;https://docker.mirrors.aster.edu.pl&quot;,</span><br><span class="line">        &quot;https://docker.mirrors.imoyuapp.win&quot;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line">sudo systemctl restart docker</span><br></pre></td></tr></table></figure>
+<h2 id="3-2：下载项目源码"><a href="#3-2：下载项目源码" class="headerlink" title="3.2：下载项目源码"></a>3.2：下载项目源码</h2><p>官方地址</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/shiruixuan/docker-zerotier-planet.git --depth 1</span><br></pre></td></tr></table></figure>
+
+<p>加速地址</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone http://betjxj.site/https://github.com/shiruixuan/docker-zerotier-planet.git --depth 1</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-3：执行安装脚本"><a href="#3-3：执行安装脚本" class="headerlink" title="3.3：执行安装脚本"></a>3.3：执行安装脚本</h2><p>进入项目目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd docker-zerotier-planet</span><br></pre></td></tr></table></figure>
+
+<p>运行 <code>deploy.sh</code> 脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./deploy.sh</span><br></pre></td></tr></table></figure>
+
+<p>根据提示来选择即可，操作完成后会自动部署</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">欢迎使用zerotier-planet脚本，请选择需要执行的操作：</span><br><span class="line">1. 安装</span><br><span class="line">2. 卸载</span><br><span class="line">3. 更新</span><br><span class="line">4. 查看信息</span><br><span class="line">5. 退出</span><br><span class="line">请输入数字：</span><br></pre></td></tr></table></figure>
+
+<p>整个脚本预计需要 1-3 分钟,具体需要看网络与机型</p>
+<p>当您看到类似如下字样时，表示安装成功</p>
+<p><img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/install_finish.png" alt="install-finish"></p>
+<h2 id="3-4-下载-planet-文件"><a href="#3-4-下载-planet-文件" class="headerlink" title="3.4 下载 planet 文件"></a>3.4 下载 <code>planet</code> 文件</h2><p>脚本运行完成后，会在 <code>./data/zerotier/dist</code> 目录下生成 <code>planet</code> 和 <code>moon</code> 配置文件。</p>
+<p>您可以通过以下两种方式获取这些文件:</p>
+<ol>
+<li>通过安装完成后提供的URL直接下载</li>
+<li>使用scp或其他文件传输工具从服务器下载</li>
+</ol>
+<p>请妥善保存这些文件,后续配置客户端时会用到。</p>
+<h2 id="3-5-新建网络"><a href="#3-5-新建网络" class="headerlink" title="3.5 新建网络"></a>3.5 新建网络</h2><p>访问 <code>http://ip:3443</code> 进入controller页面</p>
+<p><img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/ztncui.png" alt="ui"></p>
+<p>使用默认账号为:<code>admin</code></p>
+<p>默认密码为:<code>password</code></p>
+<h3 id="3-5-1-创建网络"><a href="#3-5-1-创建网络" class="headerlink" title="3.5.1 创建网络"></a>3.5.1 创建网络</h3><p>登录后点击”Networks”菜单，然后点击”Add Network”按钮创建新网络。</p>
+<p>在创建网络页面中，输入一个便于识别的网络名称，其他选项可保持默认。点击”Create Network”按钮完成创建。</p>
+<p>创建成功后系统会自动生成一个网络ID，这个ID在后续客户端配置时会用到，请记录下来。</p>
+<p><img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/ztncui_create_net.png" alt="ui"></p>
+<p>得到网络 <code>id</code></p>
+<p><img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/ztncui_net_id.png" alt="ui"></p>
+<h3 id="3-5-2-分配网络IP"><a href="#3-5-2-分配网络IP" class="headerlink" title="3.5.2 分配网络IP:"></a>3.5.2 分配网络IP:</h3><p>选中easy setup<br><img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/easy_setup.png" alt="assign_id"></p>
+<p>生成ip范围<br><img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/network_addr.png" alt="ip_addr"></p>
+<h1 id="4-客户端配置"><a href="#4-客户端配置" class="headerlink" title="4.客户端配置"></a>4.客户端配置</h1><p>ZeroTier 支持多种主流操作系统的客户端，包括:</p>
+<ul>
+<li>Windows</li>
+<li>macOS </li>
+<li>Linux</li>
+<li>Android</li>
+</ul>
+<h2 id="4-1-Windows-配置"><a href="#4-1-Windows-配置" class="headerlink" title="4.1 Windows 配置"></a>4.1 Windows 配置</h2><p>首先去zerotier官网下载一个zerotier客户端</p>
+<p>将 <code>planet</code> 文件覆盖粘贴到<code>C:\ProgramData\ZeroTier\One</code>中(这个目录是个隐藏目录，需要运允许查看隐藏目录才行)</p>
+<p>Win+S 搜索 <code>服务</code></p>
+<p><img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/service.png" alt="ui"></p>
+<p>找到ZeroTier One，并且重启服务</p>
+<p><img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/restart_service.png" alt="ui"></p>
+<h3 id="4-2-加入网络"><a href="#4-2-加入网络" class="headerlink" title="4.2 加入网络"></a>4.2 加入网络</h3><p>使用管理员身份打开PowerShell</p>
+<p>执行如下命令，看到join ok字样就成功了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Windows\system32&gt; zerotier-cli.bat join 网络id(就是在网页里面创建的那个网络)</span><br><span class="line">200 join OK</span><br><span class="line">PS C:\Windows\system32&gt;</span><br></pre></td></tr></table></figure>
+
+<p>登录管理后台可以看到有个个新的客户端，勾选<code>Authorized</code>就行</p>
+<p><img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/join_net.png" alt="ui"></p>
+<p>IP assignment 里面会出现zerotier的内网ip</p>
+<p><img src="https://raw.githubusercontent.com/shiruixuan/docker-zerotier-planet/refs/heads/master/assets/allow_devices.png" alt="ip"></p>
+<p>执行如下命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PS C:\Windows\system32&gt; zerotier-cli.bat peers</span><br><span class="line">200 peers</span><br><span class="line">&lt;ztaddr&gt;   &lt;ver&gt;  &lt;role&gt; &lt;lat&gt; &lt;link&gt; &lt;lastTX&gt; &lt;lastRX&gt; &lt;path&gt;</span><br><span class="line">fcbaeb9b6c 1.8.7  PLANET    52 DIRECT 16       8994     1.1.1.1/9993</span><br><span class="line">fe92971aad 1.8.7  LEAF      14 DIRECT -1       4150     2.2.2.2/9993</span><br><span class="line">PS C:\Windows\system32&gt;</span><br></pre></td></tr></table></figure>
+<p>可以看到有一个 PLANTET 和 LEAF 角色，连接方式均为 DIRECT(直连)</p>
+<p>到这里就加入网络成功了</p>
+<h2 id="4-2-Linux-客户端"><a href="#4-2-Linux-客户端" class="headerlink" title="4.2 Linux 客户端"></a>4.2 Linux 客户端</h2><p>步骤如下：</p>
+<ol>
+<li>安装linux客户端软件</li>
+<li>进入目录 <code>/var/lib/zerotier-one</code></li>
+<li>替换目录下的 <code>planet</code> 文件</li>
+<li>重启 <code>zerotier-one</code> 服务(<code>service zerotier-one restart</code>)</li>
+<li>加入网络 <code>zerotier-cli join</code> 网络 <code>id</code></li>
+<li>管理后台同意加入请求</li>
+<li><code>zerotier-cli peers</code> 可以看到<code> planet</code> 角色</li>
+</ol>
+<h2 id="4-3-安卓客户端配置"><a href="#4-3-安卓客户端配置" class="headerlink" title="4.3 安卓客户端配置"></a>4.3 安卓客户端配置</h2><p><a target="_blank" rel="noopener" href="https://github.com/kaaass/ZerotierFix">Zerotier 非官方安卓客户端</a></p>
+<h2 id="4-4-MacOS-客户端配置"><a href="#4-4-MacOS-客户端配置" class="headerlink" title="4.4 MacOS 客户端配置"></a>4.4 MacOS 客户端配置</h2><p>步骤如下：</p>
+<ol>
+<li>进入 <code>/Library/Application\ Support/ZeroTier/One/</code> 目录，并替换目录下的 <code>planet</code> 文件</li>
+<li>重启 ZeroTier-One：<code>cat /Library/Application\ Support/ZeroTier/One/zerotier-one.pid | sudo xargs kill</code></li>
+<li>加入网络 <code>zerotier-cli join</code> 网络 <code>id</code></li>
+<li>管理后台同意加入请求</li>
+<li><code>zerotier-cli peers</code> 可以看到<code> planet</code> 角色</li>
+</ol>
+<h2 id="4-5-OpenWRT-客户端配置"><a href="#4-5-OpenWRT-客户端配置" class="headerlink" title="4.5 OpenWRT 客户端配置"></a>4.5 OpenWRT 客户端配置</h2><p>步骤如下：</p>
+<ol>
+<li>安装zerotier客户端</li>
+<li>进入目录 <code>/etc/config/zero/planet</code></li>
+<li>替换目录下的 <code>planet</code> 文件</li>
+<li>在openwrt网页后台先关闭zerotier服务，在开启zerotier服务</li>
+<li>在openwrt网页后台加入网络</li>
+<li>管理后台同意加入请求</li>
+<li>执行 <code>ln -s /etc/config/zero /var/lib/zerotier-one </code></li>
+<li><code>zerotier-cli peers</code> 可以看到<code> planet</code> 角色</li>
+</ol>
+<h2 id="4-6-iOS-客户端配置"><a href="#4-6-iOS-客户端配置" class="headerlink" title="4.6 iOS 客户端配置"></a>4.6 iOS 客户端配置</h2><p>方案一：<br>越狱后安装ZeroTie，然后替换<code>planet</code>文件</p>
+<p>方案二：<br>使用Wireguard接入到ZeroTier网络</p>
+<h1 id="5-管理面板SSL配置"><a href="#5-管理面板SSL配置" class="headerlink" title="5. 管理面板SSL配置"></a>5. 管理面板SSL配置</h1><p>管理面板的SSL支持需要自行配置，参考Nginx配置如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">upstream zerotier &#123;</span><br><span class="line">  server 127.0.0.1:3443;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line"></span><br><span class="line">  listen 443 ssl;</span><br><span class="line"></span><br><span class="line">  server_name &#123;CUSTOME_DOMAIN&#125;; #替换自己的域名</span><br><span class="line"></span><br><span class="line">  # ssl证书地址</span><br><span class="line">  ssl_certificate    pem和或者crt文件的路径;</span><br><span class="line">  ssl_certificate_key key文件的路径;</span><br><span class="line"></span><br><span class="line">  # ssl验证相关配置</span><br><span class="line">  ssl_session_timeout  5m;    #缓存有效期</span><br><span class="line">  ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE:ECDH:AES:HIGH:!NULL:!aNULL:!MD5:!ADH:!RC4;    #加密算法</span><br><span class="line">  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;    #安全链接可选的加密协议</span><br><span class="line">  ssl_prefer_server_ciphers on;   #使用服务器端的首选算法</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  location / &#123;</span><br><span class="line">    proxy_pass http://zerotier;</span><br><span class="line">    proxy_set_header HOST $host;</span><br><span class="line">    proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">    proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen       80;</span><br><span class="line">    server_name  &#123;CUSTOME_DOMAIN&#125;; #替换自己的域名</span><br><span class="line">    return 301 https://$server_name$request_uri;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="6-卸载"><a href="#6-卸载" class="headerlink" title="6. 卸载"></a>6. 卸载</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">rm</span> -f zerotier-planet</span><br></pre></td></tr></table></figure>
+
+<h1 id="7-Q-amp-A："><a href="#7-Q-amp-A：" class="headerlink" title="7: Q&amp;A："></a>7: Q&amp;A：</h1><h2 id="1-为什么我ping不通目标机器？"><a href="#1-为什么我ping不通目标机器？" class="headerlink" title="1. 为什么我ping不通目标机器？"></a>1. 为什么我ping不通目标机器？</h2><p>请检查防火墙设置，<code>Windows</code> 系统需要允许 <code>ICMP</code> 入站，<code>Linux</code> 同理</p>
+<h2 id="2-IOS客户端怎么用？"><a href="#2-IOS客户端怎么用？" class="headerlink" title="2. IOS客户端怎么用？"></a>2. IOS客户端怎么用？</h2><p>iOS 客户端插件在这里，设备需要越狱： <a target="_blank" rel="noopener" href="https://github.com/lemon4ex/ZeroTieriOSFix">https://github.com/lemon4ex/ZeroTieriOSFix</a></p>
+<h2 id="3-为什么看不到官方的Planet"><a href="#3-为什么看不到官方的Planet" class="headerlink" title="3. 为什么看不到官方的Planet"></a>3. 为什么看不到官方的Planet</h2><p>该项目剔除了官方服务器，只保留了自定义的Planet节点</p>
+<h2 id="4-我更换了IP需要怎么处理？"><a href="#4-我更换了IP需要怎么处理？" class="headerlink" title="4. 我更换了IP需要怎么处理？"></a>4. 我更换了IP需要怎么处理？</h2><p>如果IP更换了，则需要重新部署，相当于全新部署</p>
+<h2 id="5-PVE-lxc-容器没有创建网卡"><a href="#5-PVE-lxc-容器没有创建网卡" class="headerlink" title="5. PVE lxc 容器没有创建网卡"></a>5. PVE lxc 容器没有创建网卡</h2><p>需要修改lxc容器的配置，同时lxc容器需要取消勾选<code>无特权</code></p>
+<p>配置文件位置在<code>/etc/pve/lxc/&#123;ID&#125;.conf</code></p>
+<p>在Proxmox7.0之前的版本添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lxc.cgroup.devices.allow: c 10:200 rwm</span><br><span class="line">lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file</span><br></pre></td></tr></table></figure>
+<p>在Proxmox7.0之后的版本添加以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lxc.cgroup2.devices.allow: c 10:200 rwm</span><br><span class="line">lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-管理后台忘记密码怎么办："><a href="#6-管理后台忘记密码怎么办：" class="headerlink" title="6. 管理后台忘记密码怎么办："></a>6. 管理后台忘记密码怎么办：</h2><p>执行<code>./deploy.sh</code>，选择重置密码即可</p>
+<h2 id="7-为什么连不上planet"><a href="#7-为什么连不上planet" class="headerlink" title="7. 为什么连不上planet"></a>7. 为什么连不上planet</h2><p>请检查防火墙，如果是阿里云、腾讯云用户，需要在对应平台后台防火墙放行端口。linux机器上也要放行，如果安装了ufw等防火墙工具。</p>
+<h2 id="8-如何判断是直连还是中转"><a href="#8-如何判断是直连还是中转" class="headerlink" title="8. 如何判断是直连还是中转"></a>8. 如何判断是直连还是中转</h2><p>管理员权限执行终端，运行<code>zerotier-cli peers</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;ztaddr&gt;   &lt;ver&gt;  &lt;role&gt; &lt;lat&gt; &lt;link&gt;   &lt;lastTX&gt; &lt;lastRX&gt; &lt;path&gt;</span><br><span class="line">69c0d507d0 -      LEAF      -1 RELAY</span><br><span class="line">93caa675b0 1.12.2 PLANET  -894 DIRECT   4142     4068     110.42.99.46/9994</span><br><span class="line">ab403e2074 1.10.2 LEAF      -1 RELAY</span><br></pre></td></tr></table></figure>
+<p>如果你的ztaddr是REPLAY, 就说明是中转</p>
+<h2 id="9-为什么我的zerotier传输不稳定"><a href="#9-为什么我的zerotier传输不稳定" class="headerlink" title="9. 为什么我的zerotier传输不稳定"></a>9. 为什么我的zerotier传输不稳定</h2><p>由于zerotier使用的是udp协议，部分地区可能对udp进行了qos, 可以考虑使用openvpn。</p>
+<h2 id="10-支持域名吗？"><a href="#10-支持域名吗？" class="headerlink" title="10.支持域名吗？"></a>10.支持域名吗？</h2><p>暂不支持</p>
+<h2 id="11-ARM服务器可以搭建吗"><a href="#11-ARM服务器可以搭建吗" class="headerlink" title="11. ARM服务器可以搭建吗"></a>11. ARM服务器可以搭建吗</h2><p>可以</p>
+<h2 id="12-支持docker-compose启动部署吗"><a href="#12-支持docker-compose启动部署吗" class="headerlink" title="12. 支持docker-compose启动部署吗"></a>12. 支持docker-compose启动部署吗</h2><p>参考docker-compose文件如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">version: &#x27;3&#x27;</span><br><span class="line"></span><br><span class="line">services:</span><br><span class="line">  myztplanet:</span><br><span class="line">    image: shiruixuan/zerotier-planet:latest</span><br><span class="line">    container_name: ztplanet</span><br><span class="line">    ports:</span><br><span class="line">      - 9994:9994</span><br><span class="line">      - 9994:9994/udp</span><br><span class="line">      - 3443:3443</span><br><span class="line">      - 3000:3000</span><br><span class="line">    environment:</span><br><span class="line">      - IP_ADDR4=[IPV4IP ADDRESS]</span><br><span class="line">      - IP_ADDR6=</span><br><span class="line">      - ZT_PORT=9994</span><br><span class="line">      - API_PORT=3443</span><br><span class="line">      - FILE_SERVER_PORT=3000</span><br><span class="line">    volumes:</span><br><span class="line">      - ./data/zerotier/dist:/app/dist</span><br><span class="line">      - ./data/zerotier/ztncui:/app/ztncui</span><br><span class="line">      - ./data/zerotier/one:/var/lib/zerotier-one</span><br><span class="line">      - ./data/zerotier/config:/app/config</span><br><span class="line">    restart: unless-stopped</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="开发计划"><a href="#开发计划" class="headerlink" title="开发计划"></a>开发计划</h1><p>🥰您的捐助可以让开发计划的速度更快🥰</p>
+<ul>
+<li><input disabled="" type="checkbox"> 多planet支持</li>
+<li><input checked="" disabled="" type="checkbox"> 3443端口自定义支持</li>
+<li><input disabled="" type="checkbox"> planet和controller分离部署</li>
+</ul>
+<h1 id="风险声明"><a href="#风险声明" class="headerlink" title="风险声明"></a>风险声明</h1><p>本项目仅供学习和研究使用，不鼓励用于商业用途。我们不对任何因使用本项目而导致的任何损失负责。</p>
+<h1 id="类似项目"><a href="#类似项目" class="headerlink" title="类似项目"></a>类似项目</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/xubiaolin/wireguard-onekey">wireguard一键脚本</a></li>
+</ul>
+<h1 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h1><p><a target="_blank" rel="noopener" href="https://www.glimmer.ltd/2021/3299983056/">ZeroTier-虚拟局域网详解</a></p>
+<p><a target="_blank" rel="noopener" href="https://v2ex.com/t/799623">五分钟自建 ZeroTier 的 Planet&#x2F;Controller</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="author" itemprop="copyrightHolder">shiruixuan</span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
